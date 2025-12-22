@@ -13,29 +13,18 @@ public class Roast {
     @Column(name = "roast_id")
     private Integer roastId;
 
+
+    @ManyToOne
+    @JoinColumn(name = "coffee_bean_id") 
+    private CoffeeBean coffeeBean;
+
     @Column(name = "batch_no", length = 50)
     private String batchNo;
 
     @Column(name = "green_bean_weight", precision = 6, scale = 1)
     private BigDecimal greenBeanWeight;
 
-    @Column(name = "rating")
     private Integer rating;
-
-    @Column(name = "green_bean_code")
-    private Integer greenBeanCode;
-
-    @Column(name = "country", length = 50)
-    private String country;
-
-    @Column(name = "country_eng", length = 50)
-    private String countryEng;
-
-    @Column(name = "bean_code", length = 50)
-    private String beanCode;
-
-    @Column(name = "process_method", length = 50)
-    private String processMethod;
 
     @Column(name = "charge_temp")
     private Integer chargeTemp;
@@ -43,7 +32,6 @@ public class Roast {
     @Column(name = "initial_heat")
     private Integer initialHeat;
 
-    @Column(name = "airflow")
     private Integer airflow;
 
     @Column(name = "drum_rpm")
@@ -54,9 +42,6 @@ public class Roast {
 
     @Column(name = "turning_point_temp", precision = 5, scale = 1)
     private BigDecimal turningPointTemp;
-
-    @Column(name = "dehydration_ror", precision = 5, scale = 1)
-    private BigDecimal dehydrationRor;
 
     @Column(name = "first_crack_time", length = 50)
     private String firstCrackTime;
@@ -70,32 +55,11 @@ public class Roast {
     @Column(name = "drop_temp", precision = 5, scale = 1)
     private BigDecimal dropTemp;
 
-    @Column(name = "development_temp_rise", precision = 5, scale = 1)
-    private BigDecimal developmentTempRise;
-
-    @Column(name = "development_seconds")
-    private Integer developmentSeconds;
-
-    @Column(name = "development_ror", precision = 5, scale = 1)
-    private BigDecimal developmentRor;
-
-    @Column(name = "development_ratio", precision = 6, scale = 2)
-    private BigDecimal developmentRatio;
-
     @Column(name = "roast_date")
     private LocalDate roastDate;
 
     @Column(name = "roasted_bean_weight", precision = 6, scale = 1)
     private BigDecimal roastedBeanWeight;
-
-    @Column(name = "stock_g")
-    private Integer stockG;
-
-    @Column(name = "order_g")
-    private Integer orderG;
-
-    @Column(name = "weight_loss", precision = 5, scale = 2)
-    private BigDecimal weightLoss;
 
     @Column(name = "bean_surface", precision = 5, scale = 1)
     private BigDecimal beanSurface;
@@ -103,30 +67,13 @@ public class Roast {
     @Column(name = "bean_powder", precision = 5, scale = 1)
     private BigDecimal beanPowder;
 
-    @Column(name = "rd")
-    private Integer rd;
-
-    @Column(name = "scaa_score", length = 50)
-    private String scaaScore;
-
     @Column(name = "roast_level", length = 20)
     private String roastLevel;
 
     @Column(name = "drop_point", length = 50)
     private String dropPoint;
 
-    @Column(name = "origin_factory", length = 100)
-    private String originFactory;
-
-    @Column(name = "remarks", length = 255)
-    private String remarks;
-
-    @Column(name = "source_file", length = 255)
-    private String sourceFile;
-
-    // ======================
-    // Getter / Setter
-    // ======================
+    // ===== getter / setter =====
 
     public Integer getRoastId() {
         return roastId;
@@ -134,6 +81,14 @@ public class Roast {
 
     public void setRoastId(Integer roastId) {
         this.roastId = roastId;
+    }
+
+    public CoffeeBean getCoffeeBean() {
+        return coffeeBean;
+    }
+
+    public void setCoffeeBean(CoffeeBean coffeeBean) {
+        this.coffeeBean = coffeeBean;
     }
 
     public String getBatchNo() {
@@ -158,46 +113,6 @@ public class Roast {
 
     public void setRating(Integer rating) {
         this.rating = rating;
-    }
-
-    public Integer getGreenBeanCode() {
-        return greenBeanCode;
-    }
-
-    public void setGreenBeanCode(Integer greenBeanCode) {
-        this.greenBeanCode = greenBeanCode;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCountryEng() {
-        return countryEng;
-    }
-
-    public void setCountryEng(String countryEng) {
-        this.countryEng = countryEng;
-    }
-
-    public String getBeanCode() {
-        return beanCode;
-    }
-
-    public void setBeanCode(String beanCode) {
-        this.beanCode = beanCode;
-    }
-
-    public String getProcessMethod() {
-        return processMethod;
-    }
-
-    public void setProcessMethod(String processMethod) {
-        this.processMethod = processMethod;
     }
 
     public Integer getChargeTemp() {
@@ -248,14 +163,6 @@ public class Roast {
         this.turningPointTemp = turningPointTemp;
     }
 
-    public BigDecimal getdehydrationRor() {
-        return dehydrationRor;
-    }
-
-    public void setdehydrationRor(BigDecimal dehydrationRor) {
-        this.dehydrationRor = dehydrationRor;
-    }
-
     public String getFirstCrackTime() {
         return firstCrackTime;
     }
@@ -288,38 +195,6 @@ public class Roast {
         this.dropTemp = dropTemp;
     }
 
-    public BigDecimal getDevelopmentTempRise() {
-        return developmentTempRise;
-    }
-
-    public void setDevelopmentTempRise(BigDecimal developmentTempRise) {
-        this.developmentTempRise = developmentTempRise;
-    }
-
-    public Integer getDevelopmentSeconds() {
-        return developmentSeconds;
-    }
-
-    public void setDevelopmentSeconds(Integer developmentSeconds) {
-        this.developmentSeconds = developmentSeconds;
-    }
-
-    public BigDecimal getDevelopmentRor() {
-        return developmentRor;
-    }
-
-    public void setDevelopmentRor(BigDecimal developmentRor) {
-        this.developmentRor = developmentRor;
-    }
-
-    public BigDecimal getDevelopmentRatio() {
-        return developmentRatio;
-    }
-
-    public void setDevelopmentRatio(BigDecimal developmentRatio) {
-        this.developmentRatio = developmentRatio;
-    }
-
     public LocalDate getRoastDate() {
         return roastDate;
     }
@@ -334,30 +209,6 @@ public class Roast {
 
     public void setRoastedBeanWeight(BigDecimal roastedBeanWeight) {
         this.roastedBeanWeight = roastedBeanWeight;
-    }
-
-    public Integer getStockG() {
-        return stockG;
-    }
-
-    public void setStockG(Integer stockG) {
-        this.stockG = stockG;
-    }
-
-    public Integer getOrderG() {
-        return orderG;
-    }
-
-    public void setOrderG(Integer orderG) {
-        this.orderG = orderG;
-    }
-
-    public BigDecimal getWeightLoss() {
-        return weightLoss;
-    }
-
-    public void setWeightLoss(BigDecimal weightLoss) {
-        this.weightLoss = weightLoss;
     }
 
     public BigDecimal getBeanSurface() {
@@ -376,22 +227,6 @@ public class Roast {
         this.beanPowder = beanPowder;
     }
 
-    public Integer getRd() {
-        return rd;
-    }
-
-    public void setRd(Integer rd) {
-        this.rd = rd;
-    }
-
-    public String getScaaScore() {
-        return scaaScore;
-    }
-
-    public void setScaaScore(String scaaScore) {
-        this.scaaScore = scaaScore;
-    }
-
     public String getRoastLevel() {
         return roastLevel;
     }
@@ -406,29 +241,5 @@ public class Roast {
 
     public void setDropPoint(String dropPoint) {
         this.dropPoint = dropPoint;
-    }
-
-    public String getOriginFactory() {
-        return originFactory;
-    }
-
-    public void setOriginFactory(String originFactory) {
-        this.originFactory = originFactory;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public String getSourceFile() {
-        return sourceFile;
-    }
-
-    public void setSourceFile(String sourceFile) {
-        this.sourceFile = sourceFile;
     }
 }

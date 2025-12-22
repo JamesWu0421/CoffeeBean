@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "fulfill_details")
+@Table(name = "fullfill")
 public class FullFill {
 
     @Id

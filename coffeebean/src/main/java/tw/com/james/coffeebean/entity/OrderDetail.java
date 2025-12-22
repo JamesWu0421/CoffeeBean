@@ -31,7 +31,7 @@ public class OrderDetail {
     private BigDecimal subtotal;
 
     @OneToMany(mappedBy = "orderDetail", cascade = CascadeType.ALL)
-    private List<FulfillDetail> fulfillDetails = new ArrayList<>();
+    private List<FullFill> fullFills = new ArrayList<>();
 
     // ===== getter / setter =====
 
@@ -83,11 +83,11 @@ public class OrderDetail {
         this.subtotal = subtotal;
     }
 
-    public List<FulfillDetail> getFulfillDetails() {
-        return fulfillDetails;
+    public List<FullFill> getFullFills() {
+        return fullFills;
     }
 
-    public void setFulfillDetails(List<FulfillDetail> fulfillDetails) {
-        this.fulfillDetails = fulfillDetails;
+    public void setFulfillDetails(List<FullFill> fullFills) {
+        this.fullFills = fullFills;
     }
 }
