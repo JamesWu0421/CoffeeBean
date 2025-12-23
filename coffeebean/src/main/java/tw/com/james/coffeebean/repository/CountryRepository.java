@@ -39,6 +39,17 @@ public class CountryRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    public Integer findIdByName(String countryName) {
+        List<Integer> list = em.createQuery(
+            "SELECT c.id FROM Country c WHERE c.countryName = :name",
+            Integer.class
+        )
+        .setParameter("name", countryName)
+        .getResultList();
+
+        return list.isEmpty() ? null : list.get(0);
+    }
+
     // ===== UPDATE =====
     public Country update(Country country) {
         return em.merge(country);

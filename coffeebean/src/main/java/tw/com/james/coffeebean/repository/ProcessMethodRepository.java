@@ -39,6 +39,17 @@ public class ProcessMethodRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    public Integer findIdByName(String name) {
+        List<Integer> list = em.createQuery(
+            "SELECT p.id FROM ProcessMethod p WHERE p.processMethod = :name",
+            Integer.class
+        )
+        .setParameter("name", name)
+        .getResultList();
+
+        return list.isEmpty() ? null : list.get(0);
+    }
+
     /* ===== Update ===== */
     public ProcessMethod update(ProcessMethod processMethod) {
         return em.merge(processMethod);
