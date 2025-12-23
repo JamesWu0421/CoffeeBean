@@ -11,8 +11,9 @@ import tw.com.james.coffeebean.helper.ImportHelper;
 import tw.com.james.coffeebean.repository.CoffeeBeanRepository;
 
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import static tw.com.james.coffeebean.helper.ExcelCellHelper.*;
 
@@ -28,8 +29,14 @@ public class CoffeeImportService {
     @Autowired
     private ImportHelper importHelper;
 
+    /**
+     * Sheet8：coffee_bean + stock
+     */
     @Transactional
     public void importSheet8(MultipartFile file) {
+
+    
+        Set<Integer> stockHandledBeanIds = new HashSet<>();
 
         try (InputStream is = file.getInputStream();
             Workbook workbook = WorkbookFactory.create(is)) {
@@ -45,10 +52,14 @@ public class CoffeeImportService {
                 if (row == null || isRowEmpty(row)) continue;
 
                 try {
-                    importRow(row, i + 1, evaluator);
+                    importRow(row, i + 1, evaluator, stockHandledBeanIds);
                 } catch (Exception e) {
-                    log.error("Sheet8 第 {} 列匯入失敗：{}",
-                            i + 1, e.getMessage());
+                    log.error(
+                        "Sheet8 第 {} 列匯入失敗：{}",
+                        i + 1,
+                        e.getMessage(),
+                        e
+                    );
                 }
             }
 
@@ -57,33 +68,52 @@ public class CoffeeImportService {
         }
     }
 
-    private void importRow(Row row, int rowNum, FormulaEvaluator evaluator) {
+    private void importRow(
+            Row row,
+            int rowNum,
+            FormulaEvaluator evaluator,
+            Set<Integer> stockHandledBeanIds
+    ) {
 
-        Integer year   = getInt(row, 1, evaluator);
+        // ===== unique key =====
+        Integer year   = getInt(row, 1, evaluator);   
         String region  = getString(row, 9, evaluator);
         String plant   = getString(row, 10, evaluator);
 
         if (year == null || region == null || plant == null) {
-            log.warn("第 {} 列 unique 欄位不足", rowNum);
+            log.warn("第 {} 列 unique key 不完整", rowNum);
             return;
         }
 
+        // ===== coffee_bean =====
         Integer coffeeBeanId =
                 coffeeBeanRepo.findIdByUnique(year, region, plant);
 
+        boolean isNewCoffeeBean = false;
+
         if (coffeeBeanId == null) {
             coffeeBeanId = importHelper.createCoffeeBean(
-                year,
-                region,
-                plant,
-                getString(row, 11, evaluator), // variety
-                getString(row, 7, evaluator),  // country_name
-                getString(row, 8, evaluator),  // process_method
-                getString(row, 12, evaluator)  // merchant_name
+                    year,
+                    region,
+                    plant,
+                    getString(row, 11, evaluator), // variety
+                    getString(row, 7, evaluator),  // country
+                    getString(row, 8, evaluator),  // process
+                    getString(row, 12, evaluator)  // merchant
             );
+            isNewCoffeeBean = true;
+
             log.info("第 {} 列 新增 coffee_bean id={}", rowNum, coffeeBeanId);
-        } else {
-            log.info("第 {} 列 coffee_bean 已存在 id={}", rowNum, coffeeBeanId);
+        }
+
+
+        if (stockHandledBeanIds.contains(coffeeBeanId)) {
+            log.info(
+                "第 {} 列 coffee_bean id={} stock 本次已處理，略過",
+                rowNum,
+                coffeeBeanId
+            );
+            return;
         }
 
         Integer stockG = getInt(row, 15, evaluator);
@@ -92,14 +122,27 @@ public class CoffeeImportService {
             return;
         }
 
-        importHelper.createStock(
-            coffeeBeanId,
-            stockG,
-            getDecimal(row, 13, evaluator),
-            getDecimal(row, 14, evaluator),
-            LocalDate.now()
-        );
+        if (isNewCoffeeBean) {
+            importHelper.createStock(
+                    coffeeBeanId,
+                    stockG,
+                    getDecimal(row, 13, evaluator),
+                    getDecimal(row, 14, evaluator),
+                    LocalDate.now()
+            );
+            log.info("第 {} 列 新增 stock（beanId={}）", rowNum, coffeeBeanId);
 
-        log.info("第 {} 列 新增 stock 成功", rowNum);
+        } else {
+            importHelper.updateStock(
+                    coffeeBeanId,
+                    stockG,
+                    getDecimal(row, 13, evaluator),
+                    getDecimal(row, 14, evaluator)
+            );
+            log.info("第 {} 列 更新 stock（beanId={}）", rowNum, coffeeBeanId);
+        }
+
+        
+        stockHandledBeanIds.add(coffeeBeanId);
     }
 }

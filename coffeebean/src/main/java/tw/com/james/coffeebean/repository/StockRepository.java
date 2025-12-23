@@ -34,4 +34,26 @@ public class StockRepository {
         .setParameter(5, purchaseDate)
         .executeUpdate();
     }
+
+    public void updateByCoffeeBeanId(
+            Integer coffeeBeanId,
+            Integer stockG,
+            BigDecimal purchasePrice,
+            BigDecimal sellingPrice
+    ) {
+        em.createNativeQuery(
+            """
+            UPDATE stock
+            SET stock_g = ?,
+                purchase_price = ?,
+                selling_price = ?
+            WHERE coffee_bean_id = ?
+            """
+        )
+        .setParameter(1, stockG)
+        .setParameter(2, purchasePrice)
+        .setParameter(3, sellingPrice)
+        .setParameter(4, coffeeBeanId)
+        .executeUpdate();
+    }
 }

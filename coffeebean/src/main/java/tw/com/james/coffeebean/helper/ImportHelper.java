@@ -43,13 +43,13 @@ public class ImportHelper {
         }
 
         return coffeeBeanRepo.insert(
-            countryId,
-            processId,
-            merchantId,
-            region,
-            plant,
-            variety,
-            year
+                countryId,
+                processId,
+                merchantId,
+                region,
+                plant,
+                variety,
+                year
         );
     }
 
@@ -61,11 +61,25 @@ public class ImportHelper {
             LocalDate purchaseDate
     ) {
         stockRepo.insert(
-            coffeeBeanId,
-            stockG,
-            purchasePrice,
-            sellingPrice,
-            purchaseDate
+                coffeeBeanId,
+                stockG,
+                purchasePrice,
+                sellingPrice,
+                purchaseDate
+        );
+    }
+
+    public void updateStock(
+            Integer coffeeBeanId,
+            Integer stockG,
+            BigDecimal purchasePrice,
+            BigDecimal sellingPrice
+    ) {
+        stockRepo.updateByCoffeeBeanId(
+                coffeeBeanId,
+                stockG,
+                purchasePrice,
+                sellingPrice
         );
     }
 }
