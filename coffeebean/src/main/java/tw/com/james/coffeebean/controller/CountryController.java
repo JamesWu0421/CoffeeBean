@@ -3,11 +3,20 @@ package tw.com.james.coffeebean.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tw.com.james.coffeebean.entity.Country;
-import tw.com.james.coffeebean.service.CountryService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import tw.com.james.coffeebean.dto.CountryDto;
+import tw.com.james.coffeebean.service.CountryService;
+import tw.com.james.coffeebean.vo.CountryVo;
+
+@Tag(name = "Country Controller", description = "國家增刪改查相關的 API")
 @RestController
 @RequestMapping("/api/v1/country")
 public class CountryController {
@@ -19,29 +28,46 @@ public class CountryController {
     }
 
     // ===== POST =====
-    @PostMapping
-    public ResponseEntity<Country> create(
-            @RequestBody Country country) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "成功建立國家資料"),
+            @ApiResponse(responseCode = "400", description = "國家資料不合理", content = @Content),
+    })
+    @Operation(summary = "建立國家", description = "建立一筆國家資料。")
+    @PostMapping(
+        produces = "application/json"
+    )
+    public ResponseEntity<CountryVo> create(
+            @RequestBody CountryDto dto) {
 
-        return ResponseEntity.ok(countryService.create(country));
+        return ResponseEntity.ok(countryService.create(dto));
     }
 
     // ===== DELETE =====
-    @DeleteMapping
-    public ResponseEntity<Boolean> delete(
-            @RequestBody Country country) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "成功刪除國家資料"),
+            @ApiResponse(responseCode = "404", description = "找不到國家", content = @Content),
+    })
+    @Operation(summary = "刪除國家", description = "刪除指定 id 的國家資料。")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Integer id) {
 
-        return ResponseEntity.ok(
-                countryService.delete(country.getId())
-        );
+        countryService.delete(id);
+        return ResponseEntity.noContent().build(); // ⭐ 204
     }
 
     // ===== PUT =====
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "成功更新國家資料"),
+            @ApiResponse(responseCode = "400", description = "國家資料不合理", content = @Content),
+            @ApiResponse(responseCode = "404", description = "找不到國家", content = @Content),
+    })
+    @Operation(summary = "更新國家", description = "更新指定國家資料。")
     @PutMapping
-    public ResponseEntity<Country> update(
-            @RequestBody Country country) {
+    public ResponseEntity<CountryVo> update(
+            @RequestBody CountryDto dto) {
 
-        Country updated = countryService.update(country);
+        CountryVo updated = countryService.update(dto);
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }
@@ -50,12 +76,15 @@ public class CountryController {
     }
 
     // ===== GET (pageable) =====
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "成功取得國家列表"),
+    })
+    @Operation(summary = "取得國家列表", description = "根據頁碼取得多筆國家資料。")
     @GetMapping
-    public ResponseEntity<Page<Country>> findAll(
+    public ResponseEntity<Page<CountryVo>> findAll(
             @RequestParam(defaultValue = "0") int page) {
 
-        Pageable pageable = PageRequest.of(page, 10);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").ascending());
         return ResponseEntity.ok(countryService.findAll(pageable));
     }
-
 }

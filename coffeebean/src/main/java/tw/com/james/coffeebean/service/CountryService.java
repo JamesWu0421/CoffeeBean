@@ -5,8 +5,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import tw.com.james.coffeebean.dto.CountryDto;
+import tw.com.james.coffeebean.dto.mapper.CountryDtoMapper;
 import tw.com.james.coffeebean.entity.Country;
 import tw.com.james.coffeebean.repository.CountryRepository;
+import tw.com.james.coffeebean.vo.CountryVo;
 
 import java.util.List;
 
@@ -14,16 +18,22 @@ import java.util.List;
 public class CountryService {
 
     private final CountryRepository countryRepo;
+    private final CountryDtoMapper countryDtoMapper;
 
-    public CountryService(CountryRepository countryRepo) {
+    public CountryService(
+            CountryRepository countryRepo,
+            CountryDtoMapper countryDtoMapper
+    ) {
         this.countryRepo = countryRepo;
+        this.countryDtoMapper = countryDtoMapper;
     }
 
     // ===== CREATE =====
     @Transactional
-    public Country create(Country country) {
-        countryRepo.save(country);
-        return country;
+    public CountryVo create(CountryDto dto) {
+        Country entity = countryDtoMapper.toEntity(dto);
+        countryRepo.save(entity);
+        return countryDtoMapper.toVO(entity);
     }
 
     // ===== DELETE =====
@@ -41,43 +51,41 @@ public class CountryService {
 
     // ===== UPDATE =====
     @Transactional
-    public Country update(Country req) {
+    public CountryVo update(CountryDto dto) {
 
-        Country country = countryRepo.findById(req.getId());
+        Country country = countryRepo.findById(dto.getId());
         if (country == null) {
             return null;
         }
 
-        country.setCountryName(req.getCountryName());
-        country.setCountryEngName(req.getCountryEngName());
-        country.setCountryCode(req.getCountryCode());
+        country.setCountryName(dto.getCountryName());
+        country.setCountryEngName(dto.getCountryEngName());
+        country.setCountryCode(dto.getCountryCode());
 
         countryRepo.update(country);
-        return country;
+        return countryDtoMapper.toVO(country);
     }
+
 
     // ===== READ : list + pageable =====
     @Transactional(readOnly = true)
-    public Page<Country> findAll(Pageable pageable) {
+    public Page<CountryVo> findAll(Pageable pageable) {
 
         List<Country> all = countryRepo.findAll();
         int total = all.size();
         int start = (int) pageable.getOffset();
 
         if (start >= total) {
-            return new PageImpl<>(
-                    List.of(),        
-                    pageable,
-                    total
-            );
+            return new PageImpl<>(List.of(), pageable, total);
         }
 
         int end = Math.min(start + pageable.getPageSize(), total);
 
-        return new PageImpl<>(
-                all.subList(start, end),
-                pageable,
-                total
-        );
+        List<CountryVo> content = all.subList(start, end)
+                .stream()
+                .map(countryDtoMapper::toVO)
+                .toList();
+
+        return new PageImpl<>(content, pageable, total);
     }
 }

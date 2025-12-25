@@ -36,17 +36,15 @@ public class CoffeeImportService {
     @Autowired
     private ImportHelper importHelper;
 
-    /**
-     * Sheet8：coffee_bean → stock（嚴格兩階段）
-     */
+
     @Transactional
     public void importSheet8(MultipartFile file) {
 
-        // coffeeBeanId -> StockImportData（保留順序）
+        
         Map<CoffeeBean, StockImportData> stockImportMap = new LinkedHashMap<>();
 
         try (InputStream is = file.getInputStream();
-             Workbook workbook = WorkbookFactory.create(is)) {
+            Workbook workbook = WorkbookFactory.create(is)) {
 
             FormulaEvaluator evaluator =
                     workbook.getCreationHelper().createFormulaEvaluator();
@@ -101,7 +99,7 @@ public class CoffeeImportService {
                     log.info("第 {} 列 新增 coffee_bean id={}", rowNum, newId);
                 }
 
-                // 收集 stock（不在 Phase 1 寫 DB）
+                
                 StockImportData stockData =
                         readStockData(row, rowNum, evaluator);
 
@@ -173,9 +171,7 @@ public class CoffeeImportService {
         }
     }
 
-    // =========================
-    // 私有工具
-    // =========================
+
 
     private StockImportData readStockData(
             Row row,
