@@ -3,9 +3,10 @@ package tw.com.james.coffeebean.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
+import tw.com.james.coffeebean.entity.CoffeeBean;
+import tw.com.james.coffeebean.entity.Stock;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public class StockRepository {
@@ -13,47 +14,26 @@ public class StockRepository {
     @PersistenceContext
     private EntityManager em;
 
-    public void insert(
-            Integer coffeeBeanId,
-            Integer stockG,
-            BigDecimal purchasePrice,
-            BigDecimal sellingPrice,
-            LocalDate purchaseDate
-    ) {
-        em.createNativeQuery(
+    public Stock findByCoffeeBean(CoffeeBean coffeeBean) {
+        List<Stock> list = em.createQuery(
             """
-            INSERT INTO stock
-            (coffee_bean_id, stock_g, purchase_price, selling_price, purchase_date)
-            VALUES (?, ?, ?, ?, ?)
-            """
+            FROM Stock s
+            WHERE s.coffeeBean = :coffeeBean
+            """,
+            Stock.class
         )
-        .setParameter(1, coffeeBeanId)
-        .setParameter(2, stockG)
-        .setParameter(3, purchasePrice)
-        .setParameter(4, sellingPrice)
-        .setParameter(5, purchaseDate)
-        .executeUpdate();
+        .setParameter("coffeeBean", coffeeBean)
+        .getResultList();
+
+        return list.isEmpty() ? null : list.get(0);
     }
 
-    public void updateByCoffeeBeanId(
-            Integer coffeeBeanId,
-            Integer stockG,
-            BigDecimal purchasePrice,
-            BigDecimal sellingPrice
-    ) {
-        em.createNativeQuery(
-            """
-            UPDATE stock
-            SET stock_g = ?,
-                purchase_price = ?,
-                selling_price = ?
-            WHERE coffee_bean_id = ?
-            """
-        )
-        .setParameter(1, stockG)
-        .setParameter(2, purchasePrice)
-        .setParameter(3, sellingPrice)
-        .setParameter(4, coffeeBeanId)
-        .executeUpdate();
+
+    public void save(Stock stock) {
+        if (stock.getId() == null) {
+            em.persist(stock);
+        } else {
+            em.merge(stock);
+        }
     }
 }
