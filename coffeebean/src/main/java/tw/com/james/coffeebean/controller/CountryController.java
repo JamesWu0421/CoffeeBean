@@ -1,5 +1,7 @@
 package tw.com.james.coffeebean.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -79,12 +81,15 @@ public class CountryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "成功取得國家列表"),
     })
-    @Operation(summary = "取得國家列表", description = "根據頁碼取得多筆國家資料。")
-    @GetMapping
-    public ResponseEntity<Page<CountryVo>> findAll(
-            @RequestParam(defaultValue = "0") int page) {
+    @Operation(summary = "取得國家列表", description = "根據頁碼以及顯示筆數取得多筆國家資料。")
+    @GetMapping("/{page}/{size}")
+    public ResponseEntity<List<CountryVo>> findAll(
+            @PathVariable int page,
+            @PathVariable int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<CountryVo> result = countryService.findAll(pageable);
 
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").ascending());
-        return ResponseEntity.ok(countryService.findAll(pageable));
+        return ResponseEntity.ok(result.getContent());
     }
 }
