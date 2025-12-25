@@ -5,66 +5,88 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tw.com.james.coffeebean.controller.BeanMerchantController;
+import tw.com.james.coffeebean.dto.BeanMerchantDto;
 import tw.com.james.coffeebean.entity.BeanMerchant;
+import tw.com.james.coffeebean.dto.mapper.BeanMerchantMapper;
 import tw.com.james.coffeebean.repository.BeanMerchantRepository;
+import tw.com.james.coffeebean.vo.BeanMerchantVo;
 
 import java.util.List;
 
 @Service
 public class BeanMerchantService {
 
+
     private final BeanMerchantRepository repo;
+    private final BeanMerchantMapper mapper;
 
-    public BeanMerchantService(BeanMerchantRepository repo) {
+    public BeanMerchantService(
+            BeanMerchantRepository repo,
+            BeanMerchantMapper mapper
+    , BeanMerchantController beanMerchantController) {
         this.repo = repo;
+        this.mapper = mapper;
+        
     }
 
-    /* ===== Create ===== */
+    // ===== CREATE =====
     @Transactional
-    public BeanMerchant create(BeanMerchant merchant) {
-        repo.save(merchant);
-        return merchant;
+    public BeanMerchantVo create(BeanMerchantDto dto) {
+
+        BeanMerchant entity = mapper.toEntity(dto);
+        repo.save(entity);
+
+        return mapper.toVo(entity);
     }
 
-    /* ===== Update ===== */
-    @Transactional
-    public BeanMerchant update(BeanMerchant req) {
-        BeanMerchant entity = repo.findById(req.getId());
-        if (entity == null) return null;
-
-        entity.setMerchantName(req.getMerchantName());
-        return repo.update(entity);
-    }
-
-    /* ===== Delete ===== */
+    // ===== DELETE =====
     @Transactional
     public boolean delete(Integer id) {
+
         BeanMerchant entity = repo.findById(id);
-        if (entity == null) return false;
+        if (entity == null) {
+            return false;
+        }
 
         repo.delete(id);
         return true;
     }
 
-    /* ===== Read : list + pageable ===== */
+    // ===== UPDATE =====
+    @Transactional
+    public BeanMerchantVo update(BeanMerchantDto dto) {
+
+        BeanMerchant entity = repo.findById(dto.getId());
+        if (entity == null) {
+            return null;
+        }
+
+        entity.setMerchantName(dto.getMerchantName());
+        repo.update(entity);
+
+        return mapper.toVo(entity);
+    }
+
+    // ===== READ : list + pageable =====
     @Transactional(readOnly = true)
-    public Page<BeanMerchant> findAll(Pageable pageable) {
+    public Page<BeanMerchantVo> findAll(Pageable pageable) {
 
         List<BeanMerchant> all = repo.findAll();
         int total = all.size();
         int start = (int) pageable.getOffset();
 
-        
         if (start >= total) {
             return new PageImpl<>(List.of(), pageable, total);
         }
 
         int end = Math.min(start + pageable.getPageSize(), total);
 
-        return new PageImpl<>(
-                all.subList(start, end),
-                pageable,
-                total
-        );
+        List<BeanMerchantVo> content = all.subList(start, end)
+                .stream()
+                .map(mapper::toVo)
+                .toList();
+
+        return new PageImpl<>(content, pageable, total);
     }
 }

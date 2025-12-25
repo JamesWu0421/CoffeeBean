@@ -1,6 +1,5 @@
 package tw.com.james.coffeebean.controller;
 
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -83,13 +82,13 @@ public class CountryController {
     })
     @Operation(summary = "取得國家列表", description = "根據頁碼以及顯示筆數取得多筆國家資料。")
     @GetMapping("/{page}/{size}")
-    public ResponseEntity<List<CountryVo>> findAll(
+    public ResponseEntity<Page<CountryVo>> findAll(
             @PathVariable int page,
             @PathVariable int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<CountryVo> result = countryService.findAll(pageable);
 
-        return ResponseEntity.ok(result.getContent());
+        return ResponseEntity.ok(result);
     }
 }
