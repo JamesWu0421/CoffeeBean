@@ -14,6 +14,25 @@ public class StockRepository {
     @PersistenceContext
     private EntityManager em;
 
+    
+    public Stock findById(Integer id) {
+        return em.find(Stock.class, id);
+    }
+
+    
+    public List<Stock> findAll() {
+        return em.createQuery("FROM Stock", Stock.class).getResultList();
+    }
+
+    
+    public boolean existsById(Integer id) {
+        Long count = em.createQuery("SELECT COUNT(s) FROM Stock s WHERE s.id = :id", Long.class)
+                .setParameter("id", id)
+                .getSingleResult();
+        return count > 0;
+    }
+
+    
     public Stock findByCoffeeBean(CoffeeBean coffeeBean) {
         List<Stock> list = em.createQuery(
             """
@@ -28,12 +47,21 @@ public class StockRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
-
-    public void save(Stock stock) {
+    
+    public Stock save(Stock stock) {
         if (stock.getId() == null) {
             em.persist(stock);
+            return stock; 
         } else {
-            em.merge(stock);
+            return em.merge(stock); 
+        }
+    }
+
+    
+    public void deleteById(Integer id) {
+        Stock stock = findById(id);
+        if (stock != null) {
+            em.remove(stock);
         }
     }
 }

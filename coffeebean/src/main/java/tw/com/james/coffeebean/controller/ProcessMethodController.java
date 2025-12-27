@@ -1,5 +1,7 @@
 package tw.com.james.coffeebean.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -87,5 +89,10 @@ public class ProcessMethodController {
         Page<ProcessMethodVo> result = service.findAll(pageable);
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/options")
+    public ResponseEntity<List<ProcessMethodVo>> getCountryOptions() {
+        return ResponseEntity.ok(service.findAllList());
     }
 }

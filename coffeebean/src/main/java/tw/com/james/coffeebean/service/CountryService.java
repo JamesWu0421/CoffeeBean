@@ -12,7 +12,9 @@ import tw.com.james.coffeebean.entity.Country;
 import tw.com.james.coffeebean.repository.CountryRepository;
 import tw.com.james.coffeebean.vo.CountryVo;
 
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CountryService {
@@ -87,5 +89,13 @@ public class CountryService {
                 .toList();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<CountryVo> findAllList() {
+        return countryRepo.findAll().stream()
+                .map(countryDtoMapper::toVO)
+                .collect(Collectors.toList());
     }
 }

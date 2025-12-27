@@ -5,14 +5,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tw.com.james.coffeebean.controller.BeanMerchantController;
 import tw.com.james.coffeebean.dto.BeanMerchantDto;
 import tw.com.james.coffeebean.entity.BeanMerchant;
 import tw.com.james.coffeebean.dto.mapper.BeanMerchantMapper;
 import tw.com.james.coffeebean.repository.BeanMerchantRepository;
 import tw.com.james.coffeebean.vo.BeanMerchantVo;
 
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BeanMerchantService {
@@ -24,7 +25,7 @@ public class BeanMerchantService {
     public BeanMerchantService(
             BeanMerchantRepository repo,
             BeanMerchantMapper mapper
-    , BeanMerchantController beanMerchantController) {
+    ) {
         this.repo = repo;
         this.mapper = mapper;
         
@@ -88,5 +89,12 @@ public class BeanMerchantService {
                 .toList();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BeanMerchantVo> findAllList() {
+        return repo.findAll().stream()
+                .map(mapper::toVo)
+                .collect(Collectors.toList());
     }
 }

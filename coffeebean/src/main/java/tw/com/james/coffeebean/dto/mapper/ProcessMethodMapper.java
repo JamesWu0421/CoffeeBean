@@ -1,7 +1,7 @@
 package tw.com.james.coffeebean.dto.mapper;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
+
 
 import tw.com.james.coffeebean.dto.ProcessMethodDto;
 import tw.com.james.coffeebean.entity.ProcessMethod;
@@ -16,5 +16,5 @@ public interface ProcessMethodMapper {
     // Entity → VO
     ProcessMethodVo toVo(ProcessMethod entity);
 
-  
+
 }

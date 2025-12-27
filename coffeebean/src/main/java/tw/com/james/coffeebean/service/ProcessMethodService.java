@@ -13,6 +13,7 @@ import tw.com.james.coffeebean.repository.ProcessMethodRepository;
 import tw.com.james.coffeebean.vo.ProcessMethodVo;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProcessMethodService {
@@ -87,5 +88,12 @@ public class ProcessMethodService {
                 .toList();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProcessMethodVo> findAllList() {
+        return repo.findAll().stream()
+                .map(mapper::toVo)
+                .collect(Collectors.toList());
     }
 }

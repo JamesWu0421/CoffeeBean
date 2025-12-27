@@ -50,4 +50,15 @@ public class CoffeeBeanRepository {
             return em.merge(bean);
         }
     }
+
+    public List<CoffeeBean> findAll() {
+        return em.createQuery("FROM CoffeeBean", CoffeeBean.class).getResultList();
+    }
+
+    public void deleteById(Integer id) {
+        CoffeeBean bean = findById(id);
+        if (bean != null) {
+            em.remove(bean);
+        }
+    }
 }

@@ -1,6 +1,8 @@
 package tw.com.james.coffeebean.controller;
 
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -90,5 +92,18 @@ public class CountryController {
         Page<CountryVo> result = countryService.findAll(pageable);
 
         return ResponseEntity.ok(result);
+    }
+
+    // ===== GET Options =====
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "成功取得國家下拉選單資料"),
+    })
+    @Operation(
+            summary = "取得國家下拉選單資料",
+            description = "取得所有國家資料，供下拉式選單使用"
+    )
+    @GetMapping("/options")
+    public ResponseEntity<List<CountryVo>> getCountryOptions() {
+        return ResponseEntity.ok(countryService.findAllList());
     }
 }

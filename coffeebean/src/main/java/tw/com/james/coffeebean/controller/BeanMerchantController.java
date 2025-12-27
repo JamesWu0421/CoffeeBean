@@ -1,5 +1,7 @@
 package tw.com.james.coffeebean.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import tw.com.james.coffeebean.dto.BeanMerchantDto;
 import tw.com.james.coffeebean.service.BeanMerchantService;
 import tw.com.james.coffeebean.vo.BeanMerchantVo;
+
 
 @Tag(name = "Bean Merchant Controller", description = "豆商增刪改查相關的 API")
 @RestController
@@ -87,5 +90,10 @@ public class BeanMerchantController {
         Page<BeanMerchantVo> result = service.findAll(pageable);
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/options")
+    public ResponseEntity<List<BeanMerchantVo>> getCountryOptions() {
+        return ResponseEntity.ok(service.findAllList());
     }
 }
