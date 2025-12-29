@@ -22,6 +22,7 @@ import tw.com.james.coffeebean.vo.CountryVo;
 @Tag(name = "Country Controller", description = "國家增刪改查相關的 API")
 @RestController
 @RequestMapping("/api/v1/country")
+@CrossOrigin(origins = "http://localhost:5173")
 public class CountryController {
 
     private final CountryService countryService;
@@ -106,4 +107,16 @@ public class CountryController {
     public ResponseEntity<List<CountryVo>> getCountryOptions() {
         return ResponseEntity.ok(countryService.findAllList());
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<CountryVo>> search(
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String engName
+    ) {
+        return ResponseEntity.ok(
+                countryService.search(code, name, engName)
+        );
+    }
+
 }

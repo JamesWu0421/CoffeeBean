@@ -91,6 +91,19 @@ public class CountryService {
         return new PageImpl<>(content, pageable, total);
     }
 
+    public List<CountryVo> search(
+            String code,
+            String name,
+            String engName
+    ) {
+        List<Country> list =
+                countryRepo.search(code, name, engName);
+
+        return list.stream()
+                .map(countryDtoMapper::toVO)
+                .toList();
+    }
+
 
     @Transactional(readOnly = true)
     public List<CountryVo> findAllList() {
@@ -98,4 +111,6 @@ public class CountryService {
                 .map(countryDtoMapper::toVO)
                 .collect(Collectors.toList());
     }
+
+    
 }

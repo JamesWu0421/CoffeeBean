@@ -50,6 +50,23 @@ public class ProcessMethodRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    public List<ProcessMethod> search(String name, String engName) {
+        return em.createQuery("""
+            SELECT p FROM ProcessMethod p
+            WHERE (:name IS NULL OR p.processMethod LIKE :name)
+                AND (:engName IS NULL OR p.processMethodEng LIKE :engName)
+            ORDER BY p.id
+        """, ProcessMethod.class)
+        .setParameter("name", isEmpty(name) ? null : "%" + name + "%")
+        .setParameter("engName", isEmpty(engName) ? null : "%" + engName + "%")
+        .getResultList();
+    }
+
+    private boolean isEmpty(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+
     /* ===== Update ===== */
     public ProcessMethod update(ProcessMethod processMethod) {
         return em.merge(processMethod);

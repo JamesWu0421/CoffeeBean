@@ -40,15 +40,40 @@ public class CountryRepository {
     }
 
     public Integer findIdByName(String countryName) {
-        List<Integer> list = em.createQuery(
-            "SELECT c.id FROM Country c WHERE c.countryName = :name",
-            Integer.class
-        )
-        .setParameter("name", countryName)
-        .getResultList();
+            List<Integer> list = em.createQuery(
+                "SELECT c.id FROM Country c WHERE c.countryName = :name",
+                Integer.class
+            )
+            .setParameter("name", countryName)
+            .getResultList();
 
-        return list.isEmpty() ? null : list.get(0);
+            return list.isEmpty() ? null : list.get(0);
+        }
+
+        public List<Country> search(
+            String code,
+            String name,
+            String engName
+    ) { 
+        return em.createQuery("""
+            SELECT c FROM Country c
+            WHERE (:code IS NULL OR c.countryCode LIKE :code)
+            AND (:name IS NULL OR c.countryName LIKE :name)
+            AND (:engName IS NULL OR c.countryEngName LIKE :engName)
+            ORDER BY c.id
+        """, Country.class)
+        .setParameter("code", isEmpty(code) ? null : "%" + code + "%")
+        .setParameter("name", isEmpty(name) ? null : "%" + name + "%")
+        .setParameter("engName", isEmpty(engName) ? null : "%" + engName + "%")
+        .getResultList();
     }
+
+    
+    private boolean isEmpty(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+    
 
     // ===== UPDATE =====
     public Country update(Country country) {

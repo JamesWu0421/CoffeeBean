@@ -15,12 +15,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import tw.com.james.coffeebean.dto.ProcessMethodDto;
+import tw.com.james.coffeebean.entity.ProcessMethod;
 import tw.com.james.coffeebean.service.ProcessMethodService;
 import tw.com.james.coffeebean.vo.ProcessMethodVo;
 
 @Tag(name = "Process Method Controller", description = "處理法增刪改查相關的 API")
 @RestController
 @RequestMapping("/api/v1/process-method")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ProcessMethodController {
 
     private final ProcessMethodService service;
@@ -94,5 +96,13 @@ public class ProcessMethodController {
     @GetMapping("/options")
     public ResponseEntity<List<ProcessMethodVo>> getCountryOptions() {
         return ResponseEntity.ok(service.findAllList());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProcessMethod>> search(
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String engName
+    ) {
+        return ResponseEntity.ok(service.search(name, engName));
     }
 }

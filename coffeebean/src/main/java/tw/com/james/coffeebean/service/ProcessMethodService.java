@@ -96,4 +96,9 @@ public class ProcessMethodService {
                 .map(mapper::toVo)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public List<ProcessMethod> search(String name, String engName) {
+        return repo.search(name, engName);
+    }
 }

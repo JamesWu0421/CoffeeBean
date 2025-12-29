@@ -51,6 +51,19 @@ public class BeanMerchantRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    public List<BeanMerchant> search(String name) {
+        return em.createQuery("""
+            SELECT m FROM BeanMerchant m
+            WHERE (:name IS NULL OR m.merchantName LIKE :name)
+            ORDER BY m.id
+        """, BeanMerchant.class)
+        .setParameter("name", isEmpty(name) ? null : "%" + name + "%")
+        .getResultList();
+    }
+    private boolean isEmpty(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
     /* ===== Update ===== */
     public BeanMerchant update(BeanMerchant beanMerchant) {
         return em.merge(beanMerchant);

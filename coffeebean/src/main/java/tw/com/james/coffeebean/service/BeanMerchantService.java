@@ -97,4 +97,9 @@ public class BeanMerchantService {
                 .map(mapper::toVo)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public List<BeanMerchant> search(String name) {
+        return repo.search(name);
+    }
 }

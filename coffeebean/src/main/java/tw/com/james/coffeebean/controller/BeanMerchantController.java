@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import tw.com.james.coffeebean.dto.BeanMerchantDto;
+import tw.com.james.coffeebean.entity.BeanMerchant;
 import tw.com.james.coffeebean.service.BeanMerchantService;
 import tw.com.james.coffeebean.vo.BeanMerchantVo;
 
@@ -22,6 +23,7 @@ import tw.com.james.coffeebean.vo.BeanMerchantVo;
 @Tag(name = "Bean Merchant Controller", description = "豆商增刪改查相關的 API")
 @RestController
 @RequestMapping("/api/v1/bean-merchant")
+@CrossOrigin(origins = "http://localhost:5173")
 public class BeanMerchantController {
 
     private final BeanMerchantService service;
@@ -95,5 +97,12 @@ public class BeanMerchantController {
     @GetMapping("/options")
     public ResponseEntity<List<BeanMerchantVo>> getCountryOptions() {
         return ResponseEntity.ok(service.findAllList());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<BeanMerchant>> search(
+        @RequestParam(required = false) String name
+    ) {
+        return ResponseEntity.ok(service.search(name));
     }
 }
