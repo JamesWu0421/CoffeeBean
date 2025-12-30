@@ -21,6 +21,7 @@ import java.util.List;
 @Tag(name = "Coffee Bean Controller", description = "咖啡豆增刪改查相關的 API")
 @RestController
 @RequestMapping("/api/v1/green-bean")
+@CrossOrigin(origins = "http://localhost:5173")
 public class GreenBeanController {
 
     private final GreenBeanService greenBeanService;
@@ -95,4 +96,32 @@ public class GreenBeanController {
     public ResponseEntity<List<GreenBeanVo>> getGreenBeanOptions() {
         return ResponseEntity.ok(greenBeanService.findAllList());
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<GreenBeanVo>> search(
+            @RequestParam(required = false) Integer countryId,
+            @RequestParam(required = false) Integer processMethodId,
+            @RequestParam(required = false) Integer merchantId,
+            @RequestParam(required = false) String beanVariety,
+            @RequestParam(required = false) Integer productionYear
+    ) {
+        
+        Pageable pageable = PageRequest.of(
+                0,                      
+                10,                     
+                Sort.by("id").ascending()
+        );
+
+        return ResponseEntity.ok(
+                greenBeanService.search(
+                        countryId,
+                        processMethodId,
+                        merchantId,
+                        beanVariety,
+                        productionYear,
+                        pageable
+                )
+        );
+    }
+
 }

@@ -5,10 +5,16 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import tw.com.james.coffeebean.dto.GreenBeanCreateDto;
 import tw.com.james.coffeebean.dto.GreenBeanUpdateDto;
 import tw.com.james.coffeebean.dto.mapper.GreenBeanDtoMapper;
+import tw.com.james.coffeebean.entity.BeanMerchant;
 import tw.com.james.coffeebean.entity.CoffeeBean;
+import tw.com.james.coffeebean.entity.Country;
+import tw.com.james.coffeebean.entity.ProcessMethod;
 import tw.com.james.coffeebean.repository.CoffeeBeanRepository;
 import tw.com.james.coffeebean.vo.GreenBeanVo;
 
@@ -17,6 +23,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class GreenBeanService {
+
+    @PersistenceContext
+    private EntityManager em;
 
     private final CoffeeBeanRepository coffeeBeanRepo;
     private final GreenBeanDtoMapper greenBeanDtoMapper;
@@ -54,19 +63,31 @@ public class GreenBeanService {
     // ===== UPDATE =====
     @Transactional
     public GreenBeanVo update(GreenBeanUpdateDto dto) {
-        CoffeeBean existingEntity = coffeeBeanRepo.findById(dto.getId());
-        if (existingEntity == null) {
-            return null; 
+        CoffeeBean entity = coffeeBeanRepo.findById(dto.getId());
+        if (entity == null) return null;
+
+        // ⭐ 文字欄位交給 MapStruct
+        greenBeanDtoMapper.updateEntity(dto, entity);
+
+        // ⭐ 關聯欄位「整個換」
+        if (dto.getCountryId() != null) {
+            Country countryRef = em.getReference(Country.class, dto.getCountryId());
+            entity.setCountry(countryRef);
         }
 
-        greenBeanDtoMapper.updateEntity(dto, existingEntity);
+        if (dto.getProcessMethodId() != null) {
+            ProcessMethod pmRef = em.getReference(ProcessMethod.class, dto.getProcessMethodId());
+            entity.setProcessMethod(pmRef);
+        }
 
+        if (dto.getBeanMerchantId() != null) {
+            BeanMerchant bmRef = em.getReference(BeanMerchant.class, dto.getBeanMerchantId());
+            entity.setBeanMerchant(bmRef);
+        }
 
-        CoffeeBean updatedEntity = coffeeBeanRepo.save(existingEntity);
-        
-        return greenBeanDtoMapper.toVO(updatedEntity);
+        CoffeeBean saved = coffeeBeanRepo.save(entity);
+        return greenBeanDtoMapper.toVO(saved);
     }
-
     // ===== DELETE =====
     @Transactional
     public boolean delete(Integer id) {
@@ -107,4 +128,33 @@ public class GreenBeanService {
                 .map(greenBeanDtoMapper::toVO)
                 .collect(Collectors.toList());
     }
+
+
+    @Transactional(readOnly = true)
+    public Page<GreenBeanVo> search(
+            Integer countryId,
+            Integer processMethodId,
+            Integer merchantId,
+            String beanVariety,
+            Integer productionYear,
+            Pageable pageable
+    ) {
+        Page<CoffeeBean> result = coffeeBeanRepo.search(
+                countryId,
+                processMethodId,
+                merchantId,
+                isEmpty(beanVariety) ? null : "%" + beanVariety + "%",
+                productionYear,
+                pageable
+        );
+
+        return result.map(greenBeanDtoMapper::toVO);
+    }
+
+    private boolean isEmpty(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+
+    
 }

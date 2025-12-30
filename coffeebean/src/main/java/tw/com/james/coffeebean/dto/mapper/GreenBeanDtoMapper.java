@@ -18,9 +18,9 @@ public interface GreenBeanDtoMapper {
     CoffeeBean toEntity(GreenBeanCreateDto dto);
 
     // ===== UpdateDto -> Entity  =====
-    @Mapping(source = "countryId", target = "country.id")
-    @Mapping(source = "processMethodId", target = "processMethod.id")
-    @Mapping(source = "beanMerchantId", target = "beanMerchant.id")
+    @Mapping(target = "country", ignore = true)
+    @Mapping(target = "processMethod", ignore = true)
+    @Mapping(target = "beanMerchant", ignore = true)
     void updateEntity(GreenBeanUpdateDto dto, @MappingTarget CoffeeBean entity);
 
     // ===== Entity -> VO  =====
