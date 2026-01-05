@@ -19,6 +19,7 @@ import tw.com.james.coffeebean.vo.StockVo;
 @Tag(name = "Stock Controller", description = "庫存管理增刪改查相關的 API")
 @RestController
 @RequestMapping("/api/v1/stock")
+@CrossOrigin(origins = "http://localhost:5173")
 public class StockController {
 
     private final StockService stockService;
@@ -87,4 +88,32 @@ public class StockController {
         );
         return ResponseEntity.ok(stockService.findAll(pageable));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<StockVo>> search(
+            @RequestParam(required = false) Integer coffeeBeanId,
+            @RequestParam(required = false) Integer minStockG,
+            @RequestParam(required = false) Integer maxStockG,
+            @RequestParam(required = false) String purchaseDateFrom,
+            @RequestParam(required = false) String purchaseDateTo
+    ) {
+
+        Pageable pageable = PageRequest.of(
+                0,
+                10,
+                Sort.by("id").descending()
+        );
+
+        return ResponseEntity.ok(
+                stockService.search(
+                        coffeeBeanId,
+                        minStockG,
+                        maxStockG,
+                        purchaseDateFrom,
+                        purchaseDateTo,
+                        pageable
+                )
+        );
+    }
+
 }

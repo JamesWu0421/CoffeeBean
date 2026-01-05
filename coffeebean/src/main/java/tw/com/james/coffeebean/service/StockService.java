@@ -74,4 +74,30 @@ public class StockService {
 
         return new PageImpl<>(content, pageable, total);
     }
+
+    @Transactional(readOnly = true)
+    public Page<StockVo> search(
+            Integer coffeeBeanId,
+            Integer minStockG,
+            Integer maxStockG,
+            String purchaseDateFrom,
+            String purchaseDateTo,
+            Pageable pageable
+    ) {
+        Page<Stock> result = stockRepo.search(
+                coffeeBeanId,
+                minStockG,
+                maxStockG,
+                isEmpty(purchaseDateFrom) ? null : purchaseDateFrom,
+                isEmpty(purchaseDateTo) ? null : purchaseDateTo,
+                pageable
+        );
+
+        return result.map(stockMapper::toVo);
+    }
+
+    private boolean isEmpty(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
 }

@@ -16,7 +16,7 @@ public interface StockDtoMapper {
     Stock toEntity(StockCreateDto dto);
 
     // UpdateDto -> Entity
-    @Mapping(source = "coffeeBeanId", target = "coffeeBean.id")
+    @Mapping(source = "coffeeBeanId", target = "coffeeBean.id", ignore = true)
     void updateEntity(StockUpdateDto dto, @MappingTarget Stock entity);
 
     // Entity -> VO
